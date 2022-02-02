@@ -1,0 +1,13 @@
+version: '3.2'
+
+services:
+  nginx:
+    build: nginx
+    image: jgimenezgiai/nginx-html-serve:0.0.2
+    ports:
+      - 8084:80
+  node-api:
+    build: node
+    image: jgimenezgiai/node-app:0.0.2
+    ports:
+      - 8085:3000

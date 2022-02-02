@@ -1,0 +1,67 @@
+version: '3.2'
+
+services:
+  mongodb:
+    image: bitnami/mongodb:latest
+    networks:
+      my-net:
+        aliases:
+          - "mongodb.internal"
+    environment:
+      MONGODB_ROOT_PASSWORD: pass
+      MONGODB_USERNAME: user
+      MONGODB_PASSWORD: pass
+      MONGODB_DATABASE: dbmongo
+    volumes:
+      - 'mongodb-data:/bitnami/mongodb/data:z'
+    ports:
+      - 27017:27017
+    env_file:
+      - ./.env
+  
+  mariadb:
+    image: bitnami/mariadb:latest
+    environment:
+      MARIADB_USER: dbuser
+      MARIADB_PASSWORD: dbpass
+      MARIADB_DATABASE: database
+      ALLOW_EMPTY_PASSWORD: 1
+    networks:
+      my-net:
+        aliases:
+          - "database.internal"
+    volumes:
+      - 'mysql-data:/var/lib/mysql:z'
+      - ./mysqldump:/docker-entrypoint-initdb.d:rw
+    ports:
+      - 3306:3306
+    env_file:
+      - ./.env
+  
+  nginx:
+    image: jgimenezgiai/nginx-html-serve:0.0.1
+    networks:
+      my-net:
+        aliases:
+          - "nginx.internal"
+    ports:
+      - 8081:80
+
+  node-api:
+    image: jgimenezgiai/node-app:0.0.1
+    networks:
+      my-net:
+        aliases:
+          - "node.internal"
+    ports:
+      - 8082:3000
+
+volumes:
+  mongodb-data:
+    driver: local
+  mysql-data:
+    driver: local
+
+networks:
+  my-net:
+    driver: bridge
